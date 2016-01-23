@@ -1,10 +1,7 @@
-// start slingin' some d3 here.
-
-//Create entities for our game board
 var score = 0;
 var collisions = 0;
-var width = 750;
-var height = 450;
+var width = 750; //dynamically set here
+var height = 450; //dynamically set here
 var player = new Entity(width / 2, height / 2);
 var enemies = [];
 var gameBoard = d3.select('.gameBoard')
@@ -13,11 +10,14 @@ var gameBoard = d3.select('.gameBoard')
   .attr('height', height);
 var drag = d3.behavior.drag()
   .on('drag', function() {
-    player.x = d3.event.x;
-    player.y = d3.event.y;
-    playerCircle.attr('cx', d3.event.x);
-    playerCircle.attr('cy', d3.event.y);
+    player.x = d3.event.x > width ? width : d3.event.x;
+    player.x = d3.event.x < 0 ? 0 : player.x;
+    player.y = d3.event.y > height ? height : d3.event.y;
+    player.y = d3.event.y < 0 ? 0 : player.y;
+    playerCircle.attr('cx', player.x);
+    playerCircle.attr('cy', player.y);
   });
+
 var playerCircle = gameBoard
   .selectAll('.player')
   .data([player])
@@ -47,7 +47,7 @@ function collisionDetection() {
     var enemyY = d3.select(this).attr('cy');
     var distance = Math.sqrt(Math.pow((playerX - enemyX), 2) + Math.pow((playerY - enemyY), 2));
 
-    if (distance <= 10) {
+    if (distance <= 20) {
       if (d3.select(".high span").html() < score) {
         d3.select(".high span").html(score);
       }
@@ -78,7 +78,8 @@ enemyCircles.enter()
   .attr('cy', function(d) {
     return d.y;
   })
-  .attr('r', 10);
+  .attr('r', 10)
+  .attr('fill', 'lightgrey');
 
 function moveEnemies() {
   enemyCircles
@@ -100,7 +101,6 @@ function moveEnemies() {
 setInterval(function() {
   moveEnemies();
 }, 2000);
-
 setInterval(function() {
   d3.select(".current span").html(score++);
 }, 50);
