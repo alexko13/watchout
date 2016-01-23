@@ -1,16 +1,24 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <link rel='stylesheet' type='css' href='styles.css'>
-  </head>
-  <body>
+
+<head>
+  <link rel='stylesheet' type='css' href='styles.css'>
+</head>
+
+<body>
+  <div class="content">
     <div class="scoreboard">
       <!-- Modify the scoreboard when important events occur in your game! -->
       <div class="high">High score: <span>0</span></div>
       <div class="current">Current score: <span>0</span></div>
       <div class="collisions">Collisions: <span>0</span></div>
     </div>
-    <script src="lib/d3.js" charset="utf-8"></script>
-    <script src='watchout.js'></script>
-  </body>
+    <div class="gameBoard"> 
+      <!-- where the magic happens -->
+    </div>
+  </div>
+  <script src="lib/d3.js" charset="utf-8"></script>
+  <script src='watchout.js'></script>
+</body>
+
 </html>
