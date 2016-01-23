@@ -1,71 +1,112 @@
 // start slingin' some d3 here.
 
 //Create entities for our game board
-var Entity = function(x, y) {
-  this.x = x;
-  this.y = y;
-  //    this.name = name;
-};
-
-//starting a game
-
-
-/*
-d3.select('body').selectAll('svg')
-.data([1,2,3,4,5,6,7])
-.enter()
-.append('svg')
-.classed('red', true)
-.attr('width', '100px')
-.attr('height', '100px')
-.html(function(d) {
-  return '<circle cx="50" cy="50" r="40" stroke="black" stroke-width="3" fill="red" />';
-});
-*/
-
-
-
-var player = new Entity(375, 225);
-var enemies = [];
+var score = 0;
+var collisions = 0;
 var width = 750;
 var height = 450;
+var player = new Entity(width / 2, height / 2);
+var enemies = [];
+var gameBoard = d3.select('.gameBoard')
+  .append('svg')
+  .attr('width', width)
+  .attr('height', height);
+var drag = d3.behavior.drag()
+  .on('drag', function() {
+    player.x = d3.event.x;
+    player.y = d3.event.y;
+    playerCircle.attr('cx', d3.event.x);
+    playerCircle.attr('cy', d3.event.y);
+  });
+var playerCircle = gameBoard
+  .selectAll('.player')
+  .data([player])
+  .enter()
+  .append('svg:circle')
+  .attr('class', 'player')
+  .attr('cx', function(d) {
+    return d.x;
+  })
+  .attr('cy', function(d) {
+    return d.y;
+  })
+  .attr('r', 10)
+  .attr('fill', 'red')
+  .call(drag);
 
-//initialize method
-var initialization = function() {
-  //player element gets created
-  //append to the game board inital position of center of
+function Entity(x, y) {
+  this.x = x;
+  this.y = y;
+}
 
-  //graphical representation of player location
-  d3.select('.gameBoard')
-    .append('svg')
-    .attr('width', '84px')
-    .attr('height', '84px')
-    .style({
-      "top": player.y,
-      "left": player.x
-    })
-    .classed('entity', true)
-    .html('<circle cx="42" cy="42" r="40" stroke="black" stroke-width="2" fill="red" />');
-  //controled by mouse movement
-  //d3.event d3.mouse
+function collisionDetection() {
+  return function() {
+    var playerX = player.x;
+    var playerY = player.y;
+    var enemyX = d3.select(this).attr('cx');
+    var enemyY = d3.select(this).attr('cy');
+    var distance = Math.sqrt(Math.pow((playerX - enemyX), 2) + Math.pow((playerY - enemyY), 2));
 
-  for (var i = 0; i < 5; i++){
+    if (distance <= 10) {
+      if (d3.select(".high span").html() < score) {
+        d3.select(".high span").html(score);
+      }
+      score = 0;
+      collisions++;
+      d3.select(".collisions span").html(collisions);
+    }
+  };
+}
+
+function makeEnemies(num) {
+  for (var i = 0; i < num; i++) {
     enemies.push(new Entity(Math.random() * width, Math.random() * height));
   }
+}
+makeEnemies(10);
 
-  d3.select('.gameBoard')
-    .selectAll('img')
-    .data(enemies)
-    .enter().append('img')
-    .attr('src', 'asteroid.png')
-    .attr('style', function(enemy) {
-      return 'top: ' + enemy.y + 'px; left: ' + enemy.x + 'px';
+var enemyCircles = gameBoard
+  .selectAll('.enemy')
+  .data(enemies);
+
+enemyCircles.enter()
+  .append('svg:circle')
+  .attr('class', 'enemy')
+  .attr('cx', function(d) {
+    return d.x;
+  })
+  .attr('cy', function(d) {
+    return d.y;
+  })
+  .attr('r', 10);
+
+function moveEnemies() {
+  enemyCircles
+    .transition()
+    .duration(2000)
+    .tween('collision detection', collisionDetection)
+    .attr('cx', function(d) {
+      var newLocation = Math.random() * width;
+      d.x = newLocation;
+      return newLocation;
     })
-    .classed('entity', true);
+    .attr('cy', function(d) {
+      var newLocation = Math.random() * height;
+      d.y = newLocation;
+      return newLocation;
+    });
+}
 
-};
+setInterval(function() {
+  moveEnemies();
+}, 2000);
 
-initialization();
+setInterval(function() {
+  d3.select(".current span").html(score++);
+}, 50);
+
+
+//testMovement();
 //set interval
 //as time passes
 //additional asteroids are added to the game board
@@ -79,3 +120,5 @@ initialization();
 
 //game ends on 3 collisions
 //update high score
+
+//starting a game
