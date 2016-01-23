@@ -2,11 +2,18 @@
 
 /* Note: an asteroid image is included in this repo.
 Feel free to use it if you like. */
-
+body {
+  font-family: sans-serif;
+  color: white;
+  background-color: black;
+}
+.content {
+  text-align: center;
+}
 .gameBoard {
-  width: 750px;
-  height: 450px;
-  background-color: darkgrey;
+  background-image: url('http://www.mediaversal.com/wesley/images/space-background.jpg');
+  border: 5px solid darkgrey;
+  display: inline-block;
 }
 
 .entity {
