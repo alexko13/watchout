@@ -4,10 +4,14 @@ var width = 750; //dynamically set here
 var height = 450; //dynamically set here
 var player = new Entity(width / 2, height / 2);
 var enemies = [];
+
+
 var gameBoard = d3.select('.gameBoard')
   .append('svg')
   .attr('width', width)
   .attr('height', height);
+
+
 var drag = d3.behavior.drag()
   .on('drag', function() {
     player.x = d3.event.x > width ? width : d3.event.x;
@@ -17,6 +21,7 @@ var drag = d3.behavior.drag()
     playerCircle.attr('cx', player.x);
     playerCircle.attr('cy', player.y);
   });
+
 
 var playerCircle = gameBoard
   .selectAll('.player')
@@ -81,8 +86,8 @@ enemyCircles.enter()
   .attr('r', 10)
   .attr('fill', 'lightgrey');
 
-function moveEnemies() {
-  enemyCircles
+function moveEnemies(enemy) {
+  enemy
     .transition()
     .duration(2000)
     .tween('collision detection', collisionDetection)
@@ -95,30 +100,13 @@ function moveEnemies() {
       var newLocation = Math.random() * height;
       d.y = newLocation;
       return newLocation;
+    }).each('end', function() {
+      moveEnemies(d3.select(this));
     });
 }
 
-setInterval(function() {
-  moveEnemies();
-}, 2000);
+moveEnemies(enemyCircles);
+
 setInterval(function() {
   d3.select(".current span").html(score++);
 }, 50);
-
-
-//testMovement();
-//set interval
-//as time passes
-//additional asteroids are added to the game board
-//will start small and get larger as they enter game board
-//score increases as time passes
-
-//update both player(x, y) and astroids(x,y)
-//use the objects x y to tell d3 where to place dom elements
-//when player element collides with asteroid, game ends
-//trigger update collisions
-
-//game ends on 3 collisions
-//update high score
-
-//starting a game
