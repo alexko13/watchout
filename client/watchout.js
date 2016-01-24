@@ -1,22 +1,30 @@
-var score = 0;
-var collisions = 0;
 var width = window.innerWidth - 10;
 var height = 500;
-var player = new Entity(width / 2, height / 2);
-var numberOfEnemies = 20;
+var collisions = 0;
+var score = 0;
 var enemies = [];
+var numberOfEnemies = 20;
+var player = {
+  x: width / 2,
+  y: height / 2
+};
 
 for (var i = 0; i < numberOfEnemies; i++) {
-  enemies.push(new Entity(Math.random() * width, Math.random() * height));
+  enemies.push({
+    x: Math.random() * width,
+    y: Math.random() * height
+  });
 }
 
-var gameBoard = d3.select('.gameBoard')
+var gameboard = d3
+  .select('.gameboard')
   .append('svg')
   .attr('width', width)
   .attr('height', height);
 
-
-var drag = d3.behavior.drag()
+var drag = d3
+  .behavior
+  .drag()
   .on('drag', function() {
     player.x = d3.event.x > width ? width : d3.event.x;
     player.x = d3.event.x < 0 ? 0 : player.x;
@@ -26,12 +34,12 @@ var drag = d3.behavior.drag()
     playerCircle.attr('cy', player.y);
   });
 
-
-var playerCircle = gameBoard
+var playerCircle = gameboard
   .selectAll('.player')
   .data([player])
   .enter()
   .append('svg:circle')
+  .call(drag)
   .attr('class', 'player')
   .attr('cx', function(d) {
     return d.x;
@@ -40,10 +48,9 @@ var playerCircle = gameBoard
     return d.y;
   })
   .attr('r', 10)
-  .attr('fill', 'red')
-  .call(drag);
+  .attr('fill', 'red');
 
-var enemyCircles = gameBoard
+var enemyCircles = gameboard
   .selectAll('.enemy')
   .data(enemies);
 
@@ -58,12 +65,6 @@ enemyCircles.enter()
   })
   .attr('r', 10)
   .attr('fill', 'lightgrey');
-
-
-function Entity(x, y) {
-  this.x = x;
-  this.y = y;
-}
 
 function collisionDetection() {
   var isHit = false;
