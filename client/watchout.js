@@ -1,10 +1,14 @@
 var score = 0;
 var collisions = 0;
-var width = 750; //dynamically set here
-var height = 450; //dynamically set here
+var width = window.innerWidth - 10;
+var height = 500;
 var player = new Entity(width / 2, height / 2);
+var numberOfEnemies = 20;
 var enemies = [];
 
+for (var i = 0; i < numberOfEnemies; i++) {
+  enemies.push(new Entity(Math.random() * width, Math.random() * height));
+}
 
 var gameBoard = d3.select('.gameBoard')
   .append('svg')
@@ -39,37 +43,6 @@ var playerCircle = gameBoard
   .attr('fill', 'red')
   .call(drag);
 
-function Entity(x, y) {
-  this.x = x;
-  this.y = y;
-}
-
-function collisionDetection() {
-  return function() {
-    var playerX = player.x;
-    var playerY = player.y;
-    var enemyX = d3.select(this).attr('cx');
-    var enemyY = d3.select(this).attr('cy');
-    var distance = Math.sqrt(Math.pow((playerX - enemyX), 2) + Math.pow((playerY - enemyY), 2));
-
-    if (distance <= 20) {
-      if (d3.select(".high span").html() < score) {
-        d3.select(".high span").html(score);
-      }
-      score = 0;
-      collisions++;
-      d3.select(".collisions span").html(collisions);
-    }
-  };
-}
-
-function makeEnemies(num) {
-  for (var i = 0; i < num; i++) {
-    enemies.push(new Entity(Math.random() * width, Math.random() * height));
-  }
-}
-makeEnemies(10);
-
 var enemyCircles = gameBoard
   .selectAll('.enemy')
   .data(enemies);
@@ -86,11 +59,42 @@ enemyCircles.enter()
   .attr('r', 10)
   .attr('fill', 'lightgrey');
 
+
+function Entity(x, y) {
+  this.x = x;
+  this.y = y;
+}
+
+function collisionDetection() {
+  var isHit = false;
+  var previouslyHit = false;
+  return function() {
+    var playerX = player.x;
+    var playerY = player.y;
+    var enemyX = d3.select(this).attr('cx');
+    var enemyY = d3.select(this).attr('cy');
+    var distance = Math.sqrt(Math.pow((playerX - enemyX), 2) + Math.pow((playerY - enemyY), 2));
+
+    if (distance <= 20) {
+      isHit = true;
+      if (d3.select(".high span").html() < score) {
+        d3.select(".high span").html(score);
+      }
+      score = 0;
+      if(previouslyHit != isHit) {
+        collisions++;
+        d3.select(".collisions span").html(collisions);
+      }
+      previouslyHit = isHit;
+    }
+  };
+}
+
 function moveEnemies(enemy) {
   enemy
     .transition()
     .duration(2000)
-    .tween('collision detection', collisionDetection)
+    .tween('collision-detectionion', collisionDetection)
     .attr('cx', function(d) {
       var newLocation = Math.random() * width;
       d.x = newLocation;
@@ -106,7 +110,6 @@ function moveEnemies(enemy) {
 }
 
 moveEnemies(enemyCircles);
-
 setInterval(function() {
   d3.select(".current span").html(score++);
 }, 50);
