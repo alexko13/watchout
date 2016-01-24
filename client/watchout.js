@@ -52,9 +52,8 @@ var playerCircle = gameboard
 
 var enemyCircles = gameboard
   .selectAll('.enemy')
-  .data(enemies);
-
-enemyCircles.enter()
+  .data(enemies)
+  .enter()
   .append('svg:circle')
   .attr('class', 'enemy')
   .attr('cx', function(d) {
